@@ -36,4 +36,15 @@ const hewan = [
     }
 ];
 
-module.exports = hewan;
+export default function handler(req, res) {
+    const { asalBenua } = req.query;
+
+    if (asalBenua) {
+        const hasilFilter = hewan.filter(h =>
+            h.asalBenua.toLowerCase() === asalBenua.toLowerCase()
+        );
+        res.status(200).json({ status: 'success', data: hasilFilter });
+    } else {
+        res.status(200).json({ status: 'success', data: hewan });
+    }
+}
