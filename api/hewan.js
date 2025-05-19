@@ -37,14 +37,27 @@ const hewan = [
 ];
 
 export default function handler(req, res) {
-    const { asalBenua } = req.query;
-
-    if (asalBenua) {
-        const hasilFilter = hewan.filter(h =>
-            h.asalBenua.toLowerCase() === asalBenua.toLowerCase()
-        );
-        res.status(200).json({ status: 'success', data: hasilFilter });
-    } else {
-        res.status(200).json({ status: 'success', data: hewan });
+    if (req.method === 'GET') {
+        const { asalBenua } = req.query;
+        if (asalBenua) {
+            const hasil = hewan.filter(h => h.asalBenua.toLowerCase() === asalBenua.toLowerCase());
+            return res.status(200).json({ status: 'success', data: hasil });
+        }
+        return res.status(200).json({ status: 'success', data: hewan });
     }
+
+    if (req.method === 'POST') {
+        const { nama, asalBenua, gambar } = req.body;
+
+        if (!nama || !asalBenua || !gambar) {
+            return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
+        }
+
+        const baru = { nama, asalBenua, gambar };
+        hewan.push(baru);
+
+        return res.status(201).json({ status: 'success', data: baru });
+    }
+
+    res.status(405).json({ status: 'error', message: 'Method not allowed' });
 }
