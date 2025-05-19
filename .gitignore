@@ -1,0 +1,19 @@
+# Folder yang tidak perlu dikirim ke GitHub
+
+# Dependency
+node_modules/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# dotenv config
+.env
+
+# VSCode config (opsional)
+.vscode/
