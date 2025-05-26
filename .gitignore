@@ -13,7 +13,7 @@ yarn-error.log*
 Thumbs.db
 
 # dotenv config
-.env
+.env.local
 
 # VSCode config (opsional)
 .vscode/
