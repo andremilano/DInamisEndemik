@@ -114,3 +114,9 @@ export default async function handler(req, res) {
 
 
 }
+
+console.log('Cloudinary config:', {
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiKey: process.env.CLOUDINARY_API_KEY,
+    apiSecret: process.env.CLOUDINARY_API_SECRET ? '***' : null
+});  
