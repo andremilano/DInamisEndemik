@@ -52,7 +52,7 @@ export default async function handler(req, res) {
     if (method === 'POST') {
         const { nama, asalBenua, gambarBase64 } = req.body;
 
-        if (!nama || !asalBenua || !gambarBase64) {
+        if (!nama || !asalBenua || !gambar) {
             return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
         }
 
