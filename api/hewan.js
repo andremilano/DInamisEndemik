@@ -50,7 +50,7 @@ export default async function handler(req, res) {
     // }
 
     if (method === 'POST') {
-        const { nama, asalBenua, gambarBase64 } = req.body;
+        const { nama, asalBenua, gambar } = req.body;
 
         if (!nama || !asalBenua || !gambar) {
             return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
@@ -58,7 +58,7 @@ export default async function handler(req, res) {
 
         try {
             // Upload gambar ke Cloudinary
-            const uploadRes = await cloudinary.uploader.upload(gambarBase64, {
+            const uploadRes = await cloudinary.uploader.upload(gambar, {
                 folder: "hewan" // opsional: simpan di folder bernama 'hewan'
             });
 
