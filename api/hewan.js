@@ -31,23 +31,23 @@ export default async function handler(req, res) {
         return res.status(200).json({ status: 'success', data: hewan });
     }
 
-    if (method === 'POST') {
-        const { nama, asalBenua, gambar } = req.body;
+    // if (method === 'POST') {
+    //     const { nama, asalBenua, gambar } = req.body;
 
-        if (!nama || !asalBenua || !gambar) {
-            return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
-        }
+    //     if (!nama || !asalBenua || !gambar) {
+    //         return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
+    //     }
 
-        const newData = {
-            id: ++idTerakhir,
-            nama,
-            asalBenua,
-            gambar
-        };
+    //     const newData = {
+    //         id: ++idTerakhir,
+    //         nama,
+    //         asalBenua,
+    //         gambar
+    //     };
 
-        hewan.push(newData);
-        return res.status(201).json({ status: 'success', data: newData });
-    }
+    //     hewan.push(newData);
+    //     return res.status(201).json({ status: 'success', data: newData });
+    // }
 
     if (method === 'POST') {
         const { nama, asalBenua, gambarBase64 } = req.body;
@@ -76,6 +76,22 @@ export default async function handler(req, res) {
         } catch (error) {
             return res.status(500).json({ status: 'error', message: 'Gagal upload gambar', error: error.message });
         }
+    }
+
+    if (method === 'PUT') {
+        const { id, nama, asalBenua, gambar } = req.body;
+
+        if (!id || !nama || !asalBenua || !gambar) {
+            return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
+        }
+
+        const index = hewan.findIndex(h => h.id === parseInt(id));
+        if (index === -1) {
+            return res.status(404).json({ status: 'error', message: 'Data tidak ditemukan' });
+        }
+
+        hewan[index] = { id: parseInt(id), nama, asalBenua, gambar };
+        return res.status(200).json({ status: 'success', data: hewan[index] });
     }
 
     if (method === 'DELETE') {
