@@ -1,6 +1,8 @@
 {
     "name": "DinamisEndemik",
     "version": "1.0.0",
-    "type": "module"
-  }
-  
+    "type": "module",
+    "dependencies": {
+        "cloudinary": "^2.6.1"
+    }
+}
