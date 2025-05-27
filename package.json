@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "type": "module",
     "dependencies": {
-        "cloudinary": "^2.6.1"
+        "cloudinary": "^2.6.1",
+        "formidable": "^3.5.4"
     }
 }

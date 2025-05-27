@@ -1,4 +1,12 @@
+import formidable from "formidable";
+import fs from "fs";
 import cloudinary from "../lib/cloudinary.js";
+
+export const config = {
+    api: {
+        bodyParser: false, // penting! agar Next.js tidak memproses body
+    }
+};
 
 let hewan = [
     {
@@ -20,81 +28,71 @@ let idTerakhir = 2;
 export default async function handler(req, res) {
     const { method } = req;
 
-    if (method === 'GET') {
+    if (method === "GET") {
         const { asalBenua } = req.query;
-
         if (asalBenua) {
             const hasil = hewan.filter(h => h.asalBenua.toLowerCase() === asalBenua.toLowerCase());
             return res.status(200).json({ status: 'success', data: hasil });
         }
-
         return res.status(200).json({ status: 'success', data: hewan });
     }
 
-    // if (method === 'POST') {
-    //     const { nama, asalBenua, gambar } = req.body;
+    if (method === "POST" || method === "PUT") {
+        const form = new formidable.IncomingForm({ keepExtensions: true });
 
-    //     if (!nama || !asalBenua || !gambar) {
-    //         return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
-    //     }
+        form.parse(req, async (err, fields, files) => {
+            if (err) {
+                return res.status(500).json({ status: 'error', message: 'Form parsing error' });
+            }
 
-    //     const newData = {
-    //         id: ++idTerakhir,
-    //         nama,
-    //         asalBenua,
-    //         gambar
-    //     };
+            const { nama, asalBenua, id } = fields;
+            const gambar = files.gambar;
 
-    //     hewan.push(newData);
-    //     return res.status(201).json({ status: 'success', data: newData });
-    // }
+            if (!nama || !asalBenua || !gambar) {
+                return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
+            }
 
-    if (method === 'POST') {
-        const { nama, asalBenua, gambar } = req.body;
+            try {
+                const uploadRes = await cloudinary.uploader.upload(gambar.filepath, {
+                    folder: "hewan"
+                });
 
-        if (!nama || !asalBenua || !gambar) {
-            return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
-        }
+                if (method === "POST") {
+                    const newData = {
+                        id: ++idTerakhir,
+                        nama,
+                        asalBenua,
+                        gambar: uploadRes.secure_url
+                    };
 
-        try {
-            // Upload gambar ke Cloudinary
-            const uploadRes = await cloudinary.uploader.upload(gambar, {
-                folder: "hewan" // opsional: simpan di folder bernama 'hewan'
-            });
+                    hewan.push(newData);
+                    return res.status(201).json({ status: 'success', data: newData });
 
-            const newData = {
-                id: ++idTerakhir,
-                nama,
-                asalBenua,
-                gambar: uploadRes.secure_url // simpan URL hasil upload
-            };
+                } else if (method === "PUT") {
+                    const index = hewan.findIndex(h => h.id === parseInt(id));
+                    if (index === -1) {
+                        return res.status(404).json({ status: 'error', message: 'Data tidak ditemukan' });
+                    }
 
-            hewan.push(newData);
+                    hewan[index] = {
+                        id: parseInt(id),
+                        nama,
+                        asalBenua,
+                        gambar: uploadRes.secure_url
+                    };
 
-            return res.status(201).json({ status: 'success', data: newData });
+                    return res.status(200).json({ status: 'success', data: hewan[index] });
+                }
 
-        } catch (error) {
-            return res.status(500).json({ status: 'error', message: 'Gagal upload gambar', error: error.message });
-        }
+            } catch (uploadErr) {
+                return res.status(500).json({ status: 'error', message: 'Gagal upload gambar', error: uploadErr.message });
+            }
+        });
+
+        return; // supaya tidak lanjut ke bawah
     }
 
-    if (method === 'PUT') {
-        const { id, nama, asalBenua, gambar } = req.body;
-
-        if (!id || !nama || !asalBenua || !gambar) {
-            return res.status(400).json({ status: 'error', message: 'Semua field harus diisi' });
-        }
-
-        const index = hewan.findIndex(h => h.id === parseInt(id));
-        if (index === -1) {
-            return res.status(404).json({ status: 'error', message: 'Data tidak ditemukan' });
-        }
-
-        hewan[index] = { id: parseInt(id), nama, asalBenua, gambar };
-        return res.status(200).json({ status: 'success', data: hewan[index] });
-    }
-
-    if (method === 'DELETE') {
+    if (method === "DELETE") {
         const { id } = req.body;
 
         if (!id) {
@@ -111,12 +109,4 @@ export default async function handler(req, res) {
     }
 
     res.status(405).json({ status: 'error', message: 'Method not allowed' });
-
-
 }
-
-console.log('Cloudinary config:', {
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
-    apiKey: process.env.CLOUDINARY_API_KEY,
-    apiSecret: process.env.CLOUDINARY_API_SECRET ? '***' : null
-});  
