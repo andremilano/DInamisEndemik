@@ -56,6 +56,9 @@ export default async function handler(req, res) {
     if (method === "POST" || method === "PUT") {
         try {
             const { fields, files } = await parseForm(req);
+            console.log("FIELDS:", fields);
+            console.log("FILES:", files);
+
             const { nama, asalBenua, id } = fields;
             const gambar = files.gambar;
 
